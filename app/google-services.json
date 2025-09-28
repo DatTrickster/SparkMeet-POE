@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "833361489910",
+    "project_id": "sparkmeet-8cede",
+    "storage_bucket": "sparkmeet-8cede.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833361489910:android:87f47f007b3216b626e1d7",
+        "android_client_info": {
+          "package_name": "com.example.sparkmeet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "833361489910-97j4q2i53cn9iv52uh4hcjltjj8om3gu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_hBG5DtnQyebheQlwr0RfvIB-FDbNrXU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "833361489910-5016thdof0nr1mott5gqfa3sjvfrobhr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
