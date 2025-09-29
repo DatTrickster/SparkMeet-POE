@@ -3,6 +3,6 @@ uvicorn
 python-multipart
 pydantic
 numpy
-opencv-python
+opencv-python-headless
 face_recognition
 Pillow
