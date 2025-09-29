@@ -10,13 +10,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy requirements
 COPY requirements.txt .
 
-# Install prebuilt dlib wheel first
-RUN pip install --no-cache-dir https://github.com/ageitgey/dlib-builds/releases/download/v19.24.1/dlib-19.24.1-cp310-cp310-manylinux2014_x86_64.whl
+# Install dlib-bin (prebuilt) first
+RUN pip install --no-cache-dir dlib-bin==19.24.1
 
 # Install the rest of your Python dependencies except dlib
 RUN pip install --no-cache-dir -r requirements.txt --no-deps
 
-# Copy app source
+# Copy app source code
 COPY . .
 
 # Runtime stage
