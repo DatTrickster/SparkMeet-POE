@@ -2,32 +2,40 @@
 FROM python:3.10-slim AS builder
 WORKDIR /app
 
-# Install build tools only for compiling dlib/face_recognition
+# Install minimal build tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential cmake \
+    build-essential cmake wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies into /install
+# Copy requirements
 COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-# Runtime stage (smaller, no compilers)
+# Install prebuilt dlib wheel first
+RUN pip install --no-cache-dir https://github.com/ageitgey/dlib-builds/releases/download/v19.24.1/dlib-19.24.1-cp310-cp310-manylinux2014_x86_64.whl
+
+# Install the rest of your Python dependencies except dlib
+RUN pip install --no-cache-dir -r requirements.txt --no-deps
+
+# Copy app source
+COPY . .
+
+# Runtime stage
 FROM python:3.10-slim
 WORKDIR /app
 
-# Install only runtime libraries (needed for numpy/opencv/face_recognition)
+# Install runtime libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg libsm6 libxext6 libxrender-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed Python packages from builder
-COPY --from=builder /install /usr/local
+COPY --from=builder /usr/local /usr/local
 
-# Copy app source code
+# Copy app code
 COPY . .
 
-# Expose FastAPI port
-EXPOSE 8000
+# Expose port for Cloud Run
+EXPOSE 8080
 
-# Start FastAPI with Uvicorn
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use dynamic port for Cloud Run
+CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port ${PORT:-8080}"]
