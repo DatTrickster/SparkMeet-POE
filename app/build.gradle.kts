@@ -44,7 +44,11 @@ android {
 }
 
 dependencies {
+    // In your app/build.gradle.kts dependencies:
 
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.biometric)
     implementation (libs.retrofit)
     implementation (libs.converter.gson)

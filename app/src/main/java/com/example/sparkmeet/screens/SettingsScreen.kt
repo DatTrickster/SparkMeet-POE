@@ -6,7 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Fingerprint
@@ -19,7 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
 
 data class Language(val code: String, val name: String, val flag: String)
 
@@ -28,6 +31,23 @@ data class Language(val code: String, val name: String, val flag: String)
 fun SettingsScreen(navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val auth = FirebaseAuth.getInstance()
+
+    // --- MOCK FUNCTION FOR BIOMETRIC AUTHENTICATION ---
+    fun attemptBiometricAuthentication(onSuccess: () -> Unit) {
+        coroutineScope.launch {
+            snackbarHostState.showSnackbar("Attempting setup...")
+            delay(1000)
+            val authSuccess = (0..1).random() == 1
+            if (authSuccess) {
+                snackbarHostState.showSnackbar("Successfully enabled!")
+                onSuccess()
+            } else {
+                snackbarHostState.showSnackbar("Setup failed. Please ensure biometrics are enabled.")
+            }
+        }
+    }
+    // --------------------------------------------------
 
     val languages = listOf(
         Language("en", "English", "🇺🇸"),
@@ -42,8 +62,8 @@ fun SettingsScreen(navController: NavController) {
 
     var selectedLanguage by remember { mutableStateOf("en") }
     var biometricEnabled by remember { mutableStateOf(false) }
-    var biometricType by remember { mutableStateOf("Biometric") }
-    var biometricSupported by remember { mutableStateOf(true) } // Mock as supported
+    var biometricType by remember { mutableStateOf("Fingerprint") }
+    var biometricSupported by remember { mutableStateOf(true) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -59,7 +79,7 @@ fun SettingsScreen(navController: NavController) {
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -90,12 +110,7 @@ fun SettingsScreen(navController: NavController) {
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
-                    Text(
-                        "Language",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Text("Language", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Text(
                         "Choose your preferred language",
                         fontSize = 14.sp,
@@ -130,14 +145,10 @@ fun SettingsScreen(navController: NavController) {
                                 Text(
                                     language.name,
                                     fontSize = 16.sp,
-                                    color = if (selectedLanguage == language.code)
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.onSurface,
                                     fontWeight = if (selectedLanguage == language.code)
-                                        FontWeight.SemiBold
-                                    else
-                                        FontWeight.Medium,
+                                        FontWeight.SemiBold else FontWeight.Medium,
+                                    color = if (selectedLanguage == language.code)
+                                        MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.padding(start = 12.dp)
                                 )
                             }
@@ -164,12 +175,7 @@ fun SettingsScreen(navController: NavController) {
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
-                    Text(
-                        "Security",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Text("Security", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Text(
                         "Protect your app with biometric authentication",
                         fontSize = 14.sp,
@@ -180,7 +186,7 @@ fun SettingsScreen(navController: NavController) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
@@ -199,12 +205,7 @@ fun SettingsScreen(navController: NavController) {
                                 )
                             }
                             Column(modifier = Modifier.padding(start = 16.dp)) {
-                                Text(
-                                    "${biometricType} Lock",
-                                    fontWeight = FontWeight.SemiBold,
-                                    fontSize = 16.sp,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+                                Text("${biometricType} Lock", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                                 Text(
                                     if (biometricSupported)
                                         "Use $biometricType to secure app access"
@@ -217,13 +218,18 @@ fun SettingsScreen(navController: NavController) {
                         }
                         Switch(
                             checked = biometricEnabled,
-                            onCheckedChange = { biometricEnabled = it },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                                checkedTrackColor = MaterialTheme.colorScheme.primary,
-                                uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-                                uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
+                            onCheckedChange = { isChecked ->
+                                if (isChecked) {
+                                    attemptBiometricAuthentication {
+                                        biometricEnabled = true
+                                    }
+                                } else {
+                                    biometricEnabled = false
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("$biometricType lock disabled.")
+                                    }
+                                }
+                            }
                         )
                     }
 
@@ -238,10 +244,7 @@ fun SettingsScreen(navController: NavController) {
                                 .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                "ℹ️",
-                                fontSize = 16.sp
-                            )
+                            Text("ℹ️", fontSize = 16.sp)
                             Text(
                                 "You'll need to authenticate with $biometricType each time you open the app",
                                 fontSize = 12.sp,
@@ -253,37 +256,37 @@ fun SettingsScreen(navController: NavController) {
                 }
             }
 
-            // Additional Settings Cards can be added here
+            // Account / Sign Out
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
-                    Text(
-                        "Appearance",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        "Customize how the app looks",
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    Text("Account", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(12.dp))
 
-                    // Add dark mode toggle or theme options here
-                    Text(
-                        "Dark mode and theme options coming soon...",
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                    )
+                    Button(
+                        onClick = {
+                            auth.signOut()
+                            navController.navigate("login") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = "Sign Out",
+                            tint = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Sign Out")
+                    }
                 }
             }
         }

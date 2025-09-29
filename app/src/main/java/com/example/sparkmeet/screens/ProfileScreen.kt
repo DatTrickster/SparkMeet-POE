@@ -51,6 +51,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -83,6 +84,13 @@ fun ProfileScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val db = FirebaseFirestore.getInstance()
+    val isDarkMode = androidx.compose.foundation.isSystemInDarkTheme()
+
+    // Theme colors
+    val backgroundColor = if (isDarkMode) Color(0xFF0F0F0F) else Color(0xFFFAFAFA)
+    val surfaceColor = if (isDarkMode) Color(0xFF1C1C1E) else Color.White
+    val textColor = if (isDarkMode) Color.White else Color(0xFF1A1A1A)
+    val subtitleColor = if (isDarkMode) Color(0xFFAAAAAA) else Color(0xFF6B7280)
 
     var userData by remember { mutableStateOf<UserData?>(null) }
     var personaData by remember { mutableStateOf<PersonaData?>(null) }
@@ -184,14 +192,6 @@ fun ProfileScreen(
         }
     }
 
-    // Dark mode colors
-    val backgroundColor = MaterialTheme.colorScheme.background
-    MaterialTheme.colorScheme.surface
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
-    val primaryColor = MaterialTheme.colorScheme.primary
-    MaterialTheme.colorScheme.secondaryContainer
-    val outlineColor = MaterialTheme.colorScheme.outline
-
     if (loading) {
         Box(
             modifier = Modifier
@@ -227,212 +227,203 @@ fun ProfileScreen(
             .fillMaxSize()
             .background(backgroundColor)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            // Header with gradient background
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Header with gradient
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(280.dp)
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(Color(0xFFFF0062), Color(0xFFE90C68))
                         )
                     )
+                    .padding(24.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Top bar
+                Column {
+                    Spacer(modifier = Modifier.height(32.dp))
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "Profile",
-                            style = MaterialTheme.typography.headlineMedium.copy(
+                            style = MaterialTheme.typography.headlineLarge.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = Color.White,
+                                fontSize = 28.sp
                             )
                         )
-                        IconButton(onClick = onNavigateToSettings) {
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        IconButton(
+                            onClick = onNavigateToSettings,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(Color.White.copy(alpha = 0.2f), CircleShape)
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Settings,
                                 contentDescription = "Settings",
-                                tint = Color.White,
-                                modifier = Modifier.size(28.dp)
+                                tint = Color.White
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                    // Profile Avatar
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .shadow(8.dp, CircleShape)
-                            .background(
-                                Color.White,
-                                CircleShape
-                            )
-                            .border(4.dp, Color.White, CircleShape),
-                        contentAlignment = Alignment.Center
+                    // Profile content in header
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Profile Avatar
                         Box(
                             modifier = Modifier
-                                .size(88.dp)
-                                .background(
-                                    Brush.linearGradient(
-                                        colors = listOf(Color(0xFFFF6B9D), Color(0xFFFF0062))
-                                    ),
-                                    CircleShape
-                                ),
+                                .size(80.dp)
+                                .shadow(8.dp, CircleShape)
+                                .background(Color.White, CircleShape)
+                                .border(3.dp, Color.White, CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(72.dp)
+                                    .background(
+                                        Brush.linearGradient(
+                                            colors = listOf(Color(0xFFFF6B9D), Color(0xFFFF0062))
+                                        ),
+                                        CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "${personaData?.name?.firstOrNull() ?: 'U'}",
+                                    color = Color.White,
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        Column {
                             Text(
-                                text = "${personaData?.name?.firstOrNull() ?: 'U'}",
-                                color = Color.White,
-                                fontSize = 32.sp,
-                                fontWeight = FontWeight.Bold
+                                text = "${personaData?.name ?: "User"} ${personaData?.surname ?: ""}",
+                                style = MaterialTheme.typography.headlineSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                            )
+                            Text(
+                                text = "@${userData?.username ?: "username"}",
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    color = Color.White.copy(alpha = 0.9f)
+                                )
                             )
                         }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    // Name and details
-                    Text(
-                        text = "${personaData?.name ?: "User"} ${personaData?.surname ?: ""}",
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        ),
-                        textAlign = TextAlign.Center
-                    )
-
-                    Text(
-                        text = "@${userData?.username ?: "username"}",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = Color.White.copy(alpha = 0.9f)
-                        )
-                    )
                 }
             }
 
-            // Content cards
+            // Content with cards
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .offset(y = (-40).dp)
+                    .weight(1f)
+                    .offset(y = (-20).dp)
                     .padding(horizontal = 20.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 // Quick Stats Card
                 ModernCard(
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    title = "Quick Stats",
+                    subtitle = "Your profile overview",
+                    icon = Icons.Default.Person,
+                    isDarkMode = isDarkMode
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        Text(
-                            text = "Quick Stats",
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = onSurfaceColor
-                            ),
-                            modifier = Modifier.padding(bottom = 16.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        StatItem(
+                            icon = Icons.Default.Person,
+                            value = if (personaData?.personaSet == true) "Complete" else "Setup",
+                            label = "Profile",
+                            color = if (personaData?.personaSet == true) Color(0xFF10B981) else Color(0xFFEF4444),
+                            isDarkMode = isDarkMode
                         )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            StatItem(
-                                icon = Icons.Default.Person,
-                                value = if (personaData?.personaSet == true) "Complete" else "Setup",
-                                label = "Profile",
-                                color = if (personaData?.personaSet == true) Color(0xFF10B981) else Color(0xFFEF4444)
-                            )
-                            StatItem(
-                                icon = Icons.Default.LocationOn,
-                                value = if (gpsOptIn) "On" else "Off",
-                                label = "Location",
-                                color = if (gpsOptIn) Color(0xFF3B82F6) else Color(0xFF6B7280)
-                            )
-                            StatItem(
-                                icon = Icons.Default.Psychology,
-                                value = if (personaLens) "AI On" else "AI Off",
-                                label = "PersonaLens",
-                                color = if (personaLens) Color(0xFF8B5CF6) else Color(0xFF6B7280)
-                            )
-                        }
+                        StatItem(
+                            icon = Icons.Default.LocationOn,
+                            value = if (gpsOptIn) "On" else "Off",
+                            label = "Location",
+                            color = if (gpsOptIn) Color(0xFF3B82F6) else Color(0xFF6B7280),
+                            isDarkMode = isDarkMode
+                        )
+                        StatItem(
+                            icon = Icons.Default.Psychology,
+                            value = if (personaLens) "AI On" else "AI Off",
+                            label = "PersonaLens",
+                            color = if (personaLens) Color(0xFF8B5CF6) else Color(0xFF6B7280),
+                            isDarkMode = isDarkMode
+                        )
                     }
                 }
 
                 // Personal Information Card
                 personaData?.let { data ->
                     ModernCard(
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        title = "Personal Information",
+                        subtitle = "Your basic details",
+                        icon = Icons.Default.Badge,
+                        isDarkMode = isDarkMode
                     ) {
-                        Column(modifier = Modifier.padding(20.dp)) {
-                            SectionHeader(
-                                icon = Icons.Default.Badge,
-                                title = "Personal Information"
-                            )
-
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             data.bio?.let { bio ->
-                                InfoItem(
+                                ProfileInfoItem(
                                     icon = Icons.AutoMirrored.Filled.TextSnippet,
                                     label = "Bio",
                                     value = bio,
-                                    multiline = true
+                                    multiline = true,
+                                    isDarkMode = isDarkMode
                                 )
                             }
 
-                            InfoItem(
+                            ProfileInfoItem(
                                 icon = Icons.Default.Wc,
                                 label = "Gender",
-                                value = data.gender ?: "Not specified"
+                                value = data.gender ?: "Not specified",
+                                isDarkMode = isDarkMode
                             )
 
-                            InfoItem(
+                            ProfileInfoItem(
                                 icon = Icons.Default.Email,
                                 label = "Email",
-                                value = userData?.email ?: "Not available"
+                                value = userData?.email ?: "Not available",
+                                isDarkMode = isDarkMode
                             )
 
                             data.interests?.let { interests ->
                                 if (interests.isNotEmpty()) {
-                                    Column(modifier = Modifier.padding(top = 16.dp)) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
+                                    Column(modifier = Modifier.padding(top = 8.dp)) {
+                                        Text(
+                                            text = "Interests",
+                                            style = MaterialTheme.typography.titleSmall.copy(
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = if (isDarkMode) Color.White else Color(0xFF1A1A1A)
+                                            ),
                                             modifier = Modifier.padding(bottom = 12.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Favorite,
-                                                contentDescription = null,
-                                                tint = primaryColor,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(
-                                                text = "Interests",
-                                                style = MaterialTheme.typography.titleSmall.copy(
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    color = onSurfaceColor
-                                                )
-                                            )
-                                        }
+                                        )
                                         LazyRow(
                                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                                         ) {
                                             items(interests) { interest ->
-                                                InterestChip(text = interest)
+                                                ModernInterestChip(text = interest, isDarkMode = isDarkMode)
                                             }
                                         }
                                     }
@@ -444,125 +435,90 @@ fun ProfileScreen(
 
                 // Privacy & Settings Card
                 ModernCard(
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    title = "Privacy & Settings",
+                    subtitle = "Control your app experience",
+                    icon = Icons.Default.Security,
+                    isDarkMode = isDarkMode
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        SectionHeader(
-                            icon = Icons.Default.Security,
-                            title = "Privacy & Settings"
-                        )
-
-                        EnhancedSettingRow(
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        ModernSettingRow(
                             icon = Icons.Default.LocationOn,
                             title = "Location Sharing",
                             description = "Share approximate location for better matches",
                             checked = gpsOptIn,
                             onCheckedChange = { toggleGps(it) },
-                            loading = updating["gps"] == true
+                            loading = updating["gps"] == true,
+                            isDarkMode = isDarkMode
                         )
 
-                        EnhancedSettingRow(
+                        ModernSettingRow(
                             icon = Icons.Default.Psychology,
                             title = "PersonaLens AI",
                             description = "Use AI for enhanced matching algorithms",
                             checked = personaLens,
                             onCheckedChange = { togglePersonaLens(it) },
-                            loading = updating["personaLens"] == true
+                            loading = updating["personaLens"] == true,
+                            isDarkMode = isDarkMode
                         )
                     }
                 }
 
-                // REMOVED Account Actions Card - Now moved to Settings
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
 }
 
-// KEEP ALL HELPER COMPOSABLES - THEY MUST STAY IN PROFILE SCREEN
+// UPDATED HELPER COMPOSABLES WITH MODERN STYLING
 
 @Composable
 fun ModernCard(
-    modifier: Modifier = Modifier,
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    isDarkMode: Boolean,
     content: @Composable () -> Unit
 ) {
+    val surfaceColor = if (isDarkMode) Color(0xFF1C1C1E) else Color.White
+    val textColor = if (isDarkMode) Color.White else Color(0xFF1A1A1A)
+
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(20.dp),
-                ambientColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
-                spotColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
-            ),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = surfaceColor),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isDarkMode) 0.dp else 8.dp
+        ),
+        shape = RoundedCornerShape(20.dp)
     ) {
-        content()
-    }
-}
-
-@Composable
-fun SectionHeader(
-    icon: ImageVector,
-    title: String
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(bottom = 16.dp)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        )
-    }
-}
-
-@Composable
-fun InfoItem(
-    icon: ImageVector,
-    label: String,
-    value: String,
-    multiline: Boolean = false
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = if (multiline) Alignment.Top else Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.outline,
-            modifier = Modifier.size(18.dp)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    color = MaterialTheme.colorScheme.outline,
-                    fontWeight = FontWeight.Medium
+        Column(modifier = Modifier.padding(24.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 20.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = Color(0xFFFF0062),
+                    modifier = Modifier.size(24.dp)
                 )
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = textColor
+                        )
+                    )
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = if (isDarkMode) Color(0xFFAAAAAA) else Color(0xFF6B7280)
+                        )
+                    )
+                }
+            }
+            content()
         }
     }
 }
@@ -572,7 +528,8 @@ fun StatItem(
     icon: ImageVector,
     value: String,
     label: String,
-    color: Color
+    color: Color,
+    isDarkMode: Boolean
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -601,43 +558,121 @@ fun StatItem(
         Text(
             text = label,
             style = MaterialTheme.typography.labelSmall.copy(
-                color = MaterialTheme.colorScheme.outline
+                color = if (isDarkMode) Color(0xFFAAAAAA) else Color(0xFF6B7280)
             )
         )
     }
 }
 
 @Composable
-fun EnhancedSettingRow(
+fun ProfileInfoItem(
     icon: ImageVector,
-    title: String,
-    description: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    loading: Boolean
+    label: String,
+    value: String,
+    multiline: Boolean = false,
+    isDarkMode: Boolean
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(vertical = 8.dp),
+        verticalAlignment = if (multiline) Alignment.Top else Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
                 .size(40.dp)
                 .background(
-                    if (checked) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                    else MaterialTheme.colorScheme.surfaceVariant,
-                    CircleShape
+                    Color(0xFFFF0062).copy(alpha = 0.1f),
+                    RoundedCornerShape(12.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (checked) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.outline,
+                tint = Color(0xFFFF0062),
                 modifier = Modifier.size(20.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = if (isDarkMode) Color(0xFFAAAAAA) else Color(0xFF6B7280),
+                    fontWeight = FontWeight.Medium
+                )
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Medium,
+                    color = if (isDarkMode) Color.White else Color(0xFF1A1A1A)
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun ModernInterestChip(text: String, isDarkMode: Boolean) {
+    Box(
+        modifier = Modifier
+            .background(
+                Color(0xFFFF0062).copy(alpha = 0.1f),
+                RoundedCornerShape(20.dp)
+            )
+            .border(
+                1.dp,
+                Color(0xFFFF0062).copy(alpha = 0.3f),
+                RoundedCornerShape(20.dp)
+            )
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium.copy(
+                color = Color(0xFFFF0062),
+                fontWeight = FontWeight.Medium
+            )
+        )
+    }
+}
+
+@Composable
+fun ModernSettingRow(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    loading: Boolean,
+    isDarkMode: Boolean
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(
+                    if (checked) Color(0xFFFF0062).copy(alpha = 0.1f)
+                    else if (isDarkMode) Color(0xFF2C2C2E) else Color(0xFFF3F4F6),
+                    RoundedCornerShape(12.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (checked) Color(0xFFFF0062)
+                else if (isDarkMode) Color(0xFF8E8E93) else Color(0xFF6B7280),
+                modifier = Modifier.size(24.dp)
             )
         }
 
@@ -648,13 +683,13 @@ fun EnhancedSettingRow(
                 text = title,
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = if (isDarkMode) Color.White else Color(0xFF1A1A1A)
                 )
             )
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall.copy(
-                    color = MaterialTheme.colorScheme.outline
+                    color = if (isDarkMode) Color(0xFFAAAAAA) else Color(0xFF6B7280)
                 )
             )
         }
@@ -663,7 +698,7 @@ fun EnhancedSettingRow(
             CircularProgressIndicator(
                 modifier = Modifier.size(24.dp),
                 strokeWidth = 2.dp,
-                color = MaterialTheme.colorScheme.primary
+                color = Color(0xFFFF0062)
             )
         } else {
             Switch(
@@ -671,37 +706,12 @@ fun EnhancedSettingRow(
                 onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
-                    checkedTrackColor = MaterialTheme.colorScheme.primary,
+                    checkedTrackColor = Color(0xFFFF0062),
                     uncheckedThumbColor = Color.White,
-                    uncheckedTrackColor = MaterialTheme.colorScheme.outline
+                    uncheckedTrackColor = if (isDarkMode) Color(0xFF3A3A3C) else Color(0xFFE5E7EB)
                 )
             )
         }
-    }
-}
-
-@Composable
-fun InterestChip(text: String) {
-    Box(
-        modifier = Modifier
-            .background(
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                RoundedCornerShape(20.dp)
-            )
-            .border(
-                1.dp,
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                RoundedCornerShape(20.dp)
-            )
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelMedium.copy(
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Medium
-            )
-        )
     }
 }
 
