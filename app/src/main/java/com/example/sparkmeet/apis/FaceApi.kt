@@ -28,7 +28,8 @@ interface PersonaApiService {
 
 object FaceApi {
 
-    private const val BASE_URL = "http://192.168.31.75:8000/"
+    private const val BASE_URL = "https://sparkmeetapi-833361489910.africa-south1.run.app/"
+
 
     private val apiService: PersonaApiService by lazy {
         val logging = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
