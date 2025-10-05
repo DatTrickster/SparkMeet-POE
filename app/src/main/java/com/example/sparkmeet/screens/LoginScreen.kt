@@ -1,14 +1,12 @@
 package com.example.sparkmeet.screens
-
+import com.example.sparkmeet.R
 import android.Manifest
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -26,7 +24,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -44,11 +41,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.sparkmeet.ui.theme.SparkMeetTheme
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -140,6 +147,80 @@ fun LoginScreen(
                 }
                 loading = false
             }
+    }
+
+    // NEW: Google Sign-In logic
+    val credentialManager = remember { CredentialManager.create(context) }
+    val db = remember { FirebaseFirestore.getInstance() }
+
+
+
+
+    suspend fun handleGoogleSignIn() {
+        try {
+            loading = true
+
+            val googleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)  // Make sure this is false
+                .setServerClientId(context.getString(R.string.default_web_client_id))
+                .build()
+
+            val request = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
+
+            val result = credentialManager.getCredential(context, request)
+            val credential = result.credential
+
+            // ... rest of your code
+
+            if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                val authCredential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
+                val authResult = auth.signInWithCredential(authCredential).await()
+
+                val user = auth.currentUser ?: throw Exception("User not found after auth")
+                val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
+
+                if (isNewUser) {
+                    db.collection("users").document(user.uid).set(
+                        mapOf(
+                            "uid" to user.uid,
+                            "email" to user.email,
+                            "username" to (user.displayName ?: "Anonymous"),
+                            "profilePicture" to user.photoUrl?.toString(),
+                            "personaSet" to false,
+                            "createdAt" to Timestamp.now(),
+                            "lastLoginAt" to Timestamp.now()
+                        )
+                    ).await()
+                }
+
+                Toast.makeText(context, "Google sign-in successful!", Toast.LENGTH_SHORT).show()
+                onLoginSuccess()  // This will check personaSet and navigate accordingly
+            } else {
+                throw Exception("Invalid credential type")
+            }
+        }
+        catch (e: GetCredentialException) {
+            when (e.type) {
+                "NO_CREDENTIAL" -> {
+                    Toast.makeText(context, "No Google account found on this device", Toast.LENGTH_SHORT).show()
+                }
+                "USER_CANCELED" -> {
+                    Toast.makeText(context, "Google sign-in cancelled", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    Toast.makeText(context, "Google sign-in failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        catch (e: Exception) {
+            Toast.makeText(context, "Google sign-in failed: ${e.message}", Toast.LENGTH_SHORT).show()
+        } finally {
+            loading = false
+        }
     }
 
     Box(
@@ -338,10 +419,12 @@ fun LoginScreen(
                 )
             }
 
-            // Social Login Placeholder
+            // NEW: Google Sign-In Button (replaces placeholder)
             OutlinedButton(
                 onClick = {
-                    Toast.makeText(context, "Google Sign-In coming soon!", Toast.LENGTH_SHORT).show()
+                    if (!loading) {
+                        scope.launch { handleGoogleSignIn() }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -350,7 +433,8 @@ fun LoginScreen(
                     contentColor = textColor
                 ),
                 border = androidx.compose.foundation.BorderStroke(1.dp, borderColor),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
+                enabled = !loading
             ) {
                 Text(
                     text = "Continue with Google",

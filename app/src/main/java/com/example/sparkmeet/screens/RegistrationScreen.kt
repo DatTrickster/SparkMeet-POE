@@ -128,21 +128,28 @@ fun RegistrationScreen(navController: NavHostController, auth: FirebaseAuth = Fi
     }
 
     fun validateInputs(): String? {
-        return when {
-            username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() ->
-                "Please fill in all fields"
-            username.length < 3 ->
-                "Username must be at least 3 characters"
-            !email.contains("@") || !email.contains(".") ->
-                "Please enter a valid email address"
-            password.length < 6 ->
-                "Password must be at least 6 characters"
-            password != confirmPassword ->
-                "Passwords do not match"
-            !acceptTerms ->
-                "Please accept the terms and conditions"
-            else -> null
-        }
+        if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty())
+            return "Please fill in all fields"
+        if (username.length < 3)
+            return "Username must be at least 3 characters"
+        if (!email.contains("@") || !email.contains("."))
+            return "Please enter a valid email address"
+        if (password.length < 6)
+            return "Password must be at least 6 characters"
+        if (password.length > 9)
+            return "Password cannot exceed 9 characters"
+        if (!password.matches(Regex(".*[A-Z].*")))
+            return "Password must contain at least one uppercase letter"
+        if (!password.matches(Regex(".*\\d.*")))
+            return "Password must contain at least one number"
+        if (!password.matches(Regex(".*[.#@!$%^&*()].*")))
+            return "Password must contain at least one special character (., #, @, !, etc.)"
+        if (password != confirmPassword)
+            return "Passwords do not match"
+        if (!acceptTerms)
+            return "Please accept the terms and conditions"
+
+        return null
     }
 
     fun handleRegistration() {
@@ -486,30 +493,8 @@ fun RegistrationScreen(navController: NavHostController, auth: FirebaseAuth = Fi
                 )
             }
 
-            // Social Registration Placeholder
-            OutlinedButton(
-                onClick = {
-                    Toast.makeText(context, "Google Sign-Up coming soon!", Toast.LENGTH_SHORT).show()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = textColor
-                ),
-                border = androidx.compose.foundation.BorderStroke(
-                    1.dp,
-                    if (isDarkMode) Color(0xFF2C2C2E) else Color(0xFFE5E7EB)
-                ),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Text(
-                    text = "Sign up with Google",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Medium
-                    )
-                )
-            }
+
+
 
             Spacer(modifier = Modifier.weight(1f))
 
