@@ -4,11 +4,11 @@
 <img width="500" height="500" alt="ChatGPT Image Oct 6, 2025, 09_29_54 AM" src="https://github.com/user-attachments/assets/41107955-6ea4-44b4-9de7-3e5990262a61" />
 
 ## ❓What is Spark Meet?
-Spark Meet is a modern dating application that uses a blend of user-provided data and  
-advanced technology to create meaningful connections. Our mission is to move beyond  
-simple swiping by incorporating a comprehensive Persona System, which includes the  
-unique, optional facial similarity feature (PersonaLens), to encourage more engaging  
-user discovery and interaction.
+SparkMeet is a next-generation social discovery platform designed to foster authentic connections 
+through a sophisticated blend of user-driven preferences and advanced compatibility technology. 
+Our platform moves beyond traditional matching by incorporating a comprehensive Persona System,
+featuring our unique, optional PersonaLens facial compatibility feature, 
+to enable more meaningful user discovery and engagement.
 
 ### 💡Core Features:
 
