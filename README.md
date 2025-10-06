@@ -1,8 +1,8 @@
-
+![Screenshot_20251006_084935_SparkMeet](https://github.com/user-attachments/assets/bca278c0-61e2-4379-b7a6-af9cbf69ef15)![Screenshot_20251006_085306_SparkMeet](https://github.com/user-attachments/assets/56f1de11-c874-4df0-8a21-edd95ba1e5be)![Screenshot_20251006_085139_SparkMeet](https://github.com/user-attachments/assets/45847a41-cb4a-4e92-a0bc-0c0ff08509e1)
 # ✨Spark Meet
 
+<img width="1024" height="1024" alt="ChatGPT Image Oct 6, 2025, 09_29_54 AM" src="https://github.com/user-attachments/assets/41107955-6ea4-44b4-9de7-3e5990262a61" />
 
-![ChatGPT Image Oct 6, 2025, 09_29_54 AM.png](../../OneDrive/Documentos/Notes/Notes/ChatGPT%20Image%20Oct%206%2C%202025%2C%2009_29_54%20AM.png)
 ## ❓What is Spark Meet?
 Spark Meet is a modern dating application that uses a blend of user-provided data and  
 advanced technology to create meaningful connections. Our mission is to move beyond  
@@ -12,10 +12,10 @@ user discovery and interaction.
 
 ### 💡Core Features:
 
-
+![Screenshot_20251006_121635_SparkMeet](https://github.com/user-attachments/assets/40ea1f36-e710-4030-86a9-0c321663bb94)
 **Login Screen**  
 Firebase authentication with email/password and Google Sign-In. Features theme switching, input validation, permission handling, and loading states. Built with Jetpack Compose and Material Design 3.
-![Screenshot_20251006_121635_SparkMeet.jpg](../../OneDrive/Documentos/Notes/Notes/Screenshot_20251006_121635_SparkMeet.jpg)
+
 **Core Functions:**
 - Email/password authentication
 - Google Sign-In integration
@@ -25,6 +25,7 @@ Firebase authentication with email/password and Google Sign-In. Features theme s
 - Loading states during authentication
 - Navigation to registration
 
+![Screenshot_20251006_085127_SparkMeet](https://github.com/user-attachments/assets/02ee6dec-e87b-45d2-826f-3472e1b1a70a)
 **Registration Screen**  
 Firebase account creation with email/password. Features comprehensive input validation, terms acceptance, and automatic navigation to persona setup.
 
@@ -38,7 +39,7 @@ Firebase account creation with email/password. Features comprehensive input vali
 - Dark/light theme support
 - Loading states during registration
 
-![Screenshot_20251006_084944_SparkMeet.jpg](../../OneDrive/Documentos/Notes/Notes/Screenshot_20251006_084944_SparkMeet.jpg)
+![Screenshot_20251006_084944_SparkMeet](https://github.com/user-attachments/assets/563f78f6-4b3e-4b62-8d14-cc158ba9cb21)
 **Profile Screen**  
 User profile management with persona data display and privacy settings. Features real-time data synchronization with Firebase.
 
@@ -52,8 +53,8 @@ User profile management with persona data display and privacy settings. Features
 - Settings navigation
 - Loading states and error handling
 
-![Screenshot_20251006_085139_SparkMeet.jpg](../../OneDrive/Documentos/Notes/Notes/Screenshot_20251006_085139_SparkMeet.jpg)
-![Screenshot_20251006_085207_SparkMeet.jpg](../../OneDrive/Documentos/Notes/Notes/Screenshot_20251006_085207_SparkMeet.jpg)
+![Screenshot_20251006_085139_SparkMeet](https://github.com/user-attachments/assets/15e89eef-96a1-4e5e-985e-0c3dcb166fa0)
+![Screenshot_20251006_085207_SparkMeet](https://github.com/user-attachments/assets/5af32f08-afdf-4be1-b60a-715dde813955)
 **Persona Setup Screen**  
 User profile creation with AI-powered face analysis for enhanced matching. Features comprehensive persona data collection.
 
@@ -67,7 +68,8 @@ User profile creation with AI-powered face analysis for enhanced matching. Featu
 - Dark/light theme support
 - Loading states and error handling
 
-![Screenshot_20251006_084926_SparkMeet.jpg](../../OneDrive/Documentos/Notes/Notes/Screenshot_20251006_084926_SparkMeet.jpg)
+
+![Screenshot_20251006_084926_SparkMeet](https://github.com/user-attachments/assets/d8a93bc7-44bd-4b1f-89df-0f86a4ca5bb9)
 **Home Screen**  
 Tinder-style matching interface with swipe gestures for discovering and connecting with other users.
 
@@ -82,10 +84,6 @@ Tinder-style matching interface with swipe gestures for discovering and connecti
 - Dark/light theme support
 - Empty state handling with reload option
 
-
-![Screenshot_20251006_085306_SparkMeet.jpg](../../OneDrive/Documentos/Notes/Notes/Screenshot_20251006_085306_SparkMeet.jpg)
-![Screenshot_20251006_085341_SparkMeet.jpg](../../OneDrive/Documentos/Notes/Notes/Screenshot_20251006_085341_SparkMeet.jpg)
-![Screenshot_20251006_084935_SparkMeet.jpg](../../OneDrive/Documentos/Notes/Notes/Screenshot_20251006_084935_SparkMeet.jpg)
 **Chats Screen**  
 Real-time messaging interface with chat requests and conversation management.
 
@@ -100,7 +98,9 @@ Real-time messaging interface with chat requests and conversation management.
 - Empty state handling
 - Back navigation in chat detail view
 
-![Screenshot_20251006_084629_SparkMeet.jpg](../../OneDrive/Documentos/Notes/Notes/Screenshot_20251006_084629_SparkMeet.jpg)
+![Screenshot_20251006_084935_SparkMeet](https://github.com/user-attachments/assets/5e1f05a6-9c37-4294-acc7-b135e30beb17)
+![Screenshot_20251006_085306_SparkMeet](https://github.com/user-attachments/assets/b678f86e-317c-4e57-8bfa-dde7324a25db)
+![Screenshot_20251006_085341_SparkMeet](https://github.com/user-attachments/assets/4be675cd-d546-47f3-8857-1cb8685f47e0)
 **Search Screen**  
 User discovery interface with advanced filtering and profile exploration capabilities.
 
@@ -115,7 +115,7 @@ User discovery interface with advanced filtering and profile exploration capabil
 - Dark/light theme support
 - Loading states during data fetch
 
-![Screenshot_20251006_084948_SparkMeet.jpg](../../OneDrive/Documentos/Notes/Notes/Screenshot_20251006_084948_SparkMeet.jpg)
+![Screenshot_20251006_084629_SparkMeet](https://github.com/user-attachments/assets/9f0798d2-8a0c-4398-a12b-37996b2a9dbf)
 **Settings Screen**  
 App configuration and security management with biometric authentication support.
 
