@@ -1,7 +1,7 @@
-![Screenshot_20251006_084935_SparkMeet](https://github.com/user-attachments/assets/bca278c0-61e2-4379-b7a6-af9cbf69ef15)![Screenshot_20251006_085306_SparkMeet](https://github.com/user-attachments/assets/56f1de11-c874-4df0-8a21-edd95ba1e5be)![Screenshot_20251006_085139_SparkMeet](https://github.com/user-attachments/assets/45847a41-cb4a-4e92-a0bc-0c0ff08509e1)
+
 # ✨Spark Meet
 
-<img width="1024" height="1024" alt="ChatGPT Image Oct 6, 2025, 09_29_54 AM" src="https://github.com/user-attachments/assets/41107955-6ea4-44b4-9de7-3e5990262a61" />
+<img width="500" height="500" alt="ChatGPT Image Oct 6, 2025, 09_29_54 AM" src="https://github.com/user-attachments/assets/41107955-6ea4-44b4-9de7-3e5990262a61" />
 
 ## ❓What is Spark Meet?
 Spark Meet is a modern dating application that uses a blend of user-provided data and  
